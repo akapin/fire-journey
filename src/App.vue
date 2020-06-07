@@ -1,6 +1,12 @@
 <template>
   <div id="app">
-    <router-view/>
+    <section id="nav">
+      <router-link to="/portfolio">Портфель</router-link> |
+      <router-link to="/operations">Операции</router-link>
+    </section>
+    <keep-alive>
+      <router-view/>
+    </keep-alive>
   </div>
 </template>
 

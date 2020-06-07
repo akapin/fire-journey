@@ -1,27 +1,25 @@
 <template>
-  <div class="home">
-    <section class="portfolio">
-      <h1>Мой портфель</h1>
-      <table class="portfolio__table">
-        <thead>
-          <tr>
-            <th>Тип</th>
-            <th>Тикер</th>
-            <th>Название</th>
-            <th>Количество</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="position in positions" :key="position.figi">
-            <td>{{ position.instrumentType }}</td>
-            <td>{{ position.ticker }}</td>
-            <td>{{ position.name }}</td>
-            <td>{{ position.balance }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-  </div>
+  <section class="portfolio">
+    <h1>Портфель</h1>
+    <table class="portfolio__table">
+      <thead>
+        <tr>
+          <th>Тип</th>
+          <th>Тикер</th>
+          <th>Название</th>
+          <th>Количество</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="position in positions" :key="position.figi">
+          <td>{{ position.instrumentType }}</td>
+          <td>{{ position.ticker }}</td>
+          <td>{{ position.name }}</td>
+          <td>{{ position.balance }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 </template>
 
 <script>
@@ -53,7 +51,7 @@ export default {
 </script>
 
 <style lang="scss">
-.home {
+.portfolio {
   width: auto;
   margin: 0 auto;
 
@@ -73,7 +71,7 @@ export default {
 }
 
 @media (min-width: 1200px) {
-  .home {
+  .portfolio {
     width: 1200px;
   }
 }

@@ -1,14 +1,21 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
+
+const Portfolio = () => import('@/views/Portfolio.vue');
+const Operations = () => import('@/views/Operations.vue');
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home,
+    path: '/portfolio',
+    name: 'Portfolio',
+    component: Portfolio,
+  },
+  {
+    path: '/operations',
+    name: 'Operations',
+    component: Operations,
   },
 ];
 
