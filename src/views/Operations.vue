@@ -6,7 +6,8 @@
         <tr>
           <th>Дата</th>
           <th>Тип</th>
-          <th>FIGI</th>
+          <th>Тикер</th>
+          <th>Имя</th>
           <th>Плата</th>
           <th>Цена</th>
           <th>Количество</th>
@@ -18,7 +19,8 @@
         <tr v-for="operation in operations" :key="operation.id">
           <td>{{ operation.date | formatDate }}</td>
           <td>{{ operation.instrumentType }}</td>
-          <td>{{ operation.figi }}</td>
+          <td>{{ operation.ticker }}</td>
+          <td>{{ operation.name }}</td>
           <td>{{ operation.payment }}</td>
           <td>{{ operation.price }}</td>
           <td>{{ operation.quantity }}</td>
@@ -53,12 +55,23 @@ export default {
   },
 
   methods: {
-    loadOperations() {
-      api(`operations?from=${this.dateFrom}&to=${this.dateTo}`)
+    async loadOperations() {
+      this.operations = await api(`operations?from=${this.dateFrom}&to=${this.dateTo}`)
         .then((response) => response.json())
-        .then((json) => {
-          this.operations = json.payload.operations;
-        });
+        .then((json) => json.payload.operations)
+        .then((operations) => Promise.all(operations.map(async (operation) => {
+          const operationClone = { ...operation };
+          const instrument = await this.loadInstrument(operationClone.figi);
+          operationClone.ticker = instrument.ticker;
+          operationClone.name = instrument.name;
+          return operationClone;
+        })));
+    },
+
+    loadInstrument(figi) {
+      return api(`market/search/by-figi?figi=${figi}`)
+        .then((response) => response.json())
+        .then((json) => json.payload);
     },
   },
 
