@@ -8,6 +8,8 @@
           <th>Тикер</th>
           <th>Название</th>
           <th>Количество</th>
+          <th>Цена</th>
+          <th>Сумма</th>
         </tr>
       </thead>
       <tbody>
@@ -16,6 +18,9 @@
           <td>{{ position.ticker }}</td>
           <td>{{ position.name }}</td>
           <td>{{ position.balance }}</td>
+          <td>{{ position.price }} {{ position.currency | formatCurrency }}</td>
+          <td>{{ getPositionTotal(position.balance, position.price) }}
+            {{ position.currency | formatCurrency }}</td>
         </tr>
       </tbody>
     </table>
@@ -26,7 +31,7 @@
 import api from '@/api';
 
 export default {
-  name: 'Home',
+  name: 'Portfolio',
 
   data() {
     return {
@@ -34,13 +39,49 @@ export default {
     };
   },
 
+  filters: {
+    formatCurrency(value) {
+      switch (value) {
+        case 'USD':
+          return '$';
+        case 'RUB':
+          return '₽';
+        default:
+          break;
+      }
+      return value;
+    },
+  },
+
   methods: {
-    loadPortfolio() {
-      api('portfolio')
+    async loadPortfolio() {
+      this.positions = await api('portfolio')
         .then((response) => response.json())
-        .then((json) => {
-          this.positions = json.payload.positions;
-        });
+        .then((json) => json.payload.positions)
+        .then((positions) => Promise.all(positions.map(async (position) => {
+          const positionClone = { ...position };
+          const price = await this.loadPrice(positionClone.figi);
+          const instrument = await this.loadInstrument(positionClone.figi);
+          positionClone.price = price;
+          positionClone.currency = instrument.currency;
+          return positionClone;
+        })));
+    },
+
+    loadPrice(figi) {
+      return api(`market/orderbook?figi=${figi}&depth=1`)
+        .then((response) => response.json())
+        .then((json) => json.payload.lastPrice);
+    },
+
+    loadInstrument(figi) {
+      return api(`market/search/by-figi?figi=${figi}`)
+        .then((response) => response.json())
+        .then((json) => json.payload);
+    },
+
+    getPositionTotal(balance, price) {
+      return (balance * price).toFixed(2);
     },
   },
 
